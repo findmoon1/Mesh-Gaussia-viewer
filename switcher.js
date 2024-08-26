@@ -129,22 +129,6 @@ export function initSceneSwitcher() {
     const canvas_three = document.querySelector('#threeJSCanvas');
     canvas_three.style.display = 'none';
     showThreeJS();
-    /*  const canvas_gausssian = document.querySelector('#gaussianCanvas');
-     canvas_gausssian.style.display = 'none'; */
 
-    ;
-    /* console.log('later');
-
-    // 使用 setTimeout 延迟执行
-    setTimeout(() => {
-        console.log('This message is shown after 5 seconds');
-    }, 5000);
-
-    console.log('End'); */
-
-
-
-    // 监听键盘事件来切换场景
-    // document.addEventListener('keydown', toggleScene);
 }
 

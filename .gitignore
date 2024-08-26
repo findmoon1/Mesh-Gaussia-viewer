@@ -1,0 +1,7 @@
+
+dist
+mod
+models
+
+node_modules
+package-lock.json

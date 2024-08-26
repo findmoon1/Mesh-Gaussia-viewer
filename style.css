@@ -1,0 +1,26 @@
+/* body {
+    margin: 0;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+#threeJSCanvas {
+    display: none;
+}
+
+#gaussianCanvas {
+    display: block;
+} */
+
+/* styles.css */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* 防止滚动条 */
+}

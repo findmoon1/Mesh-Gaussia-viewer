@@ -1,155 +1,61 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
-export function initThreeJS() {
-    console.log('Initializing Three.js...');
-    const canvas = document.querySelector('#threeJSCanvas');
-    if (!canvas) {
-        console.error('Canvas element with ID "threeJSCanvas" not found');
-        return;
+import { initGaussian } from './gaussianViewer'
+import { initMesh } from './meshViewer'
+
+const canvas = document.querySelector('#c');
+
+const camera = new THREE.PerspectiveCamera(65, 800 / 600, 0.1, 500);
+camera.position.copy(new THREE.Vector3().fromArray([-0.5, -1, -7]));
+camera.up = new THREE.Vector3().fromArray([0, -0.8, -0.5]).normalize();
+camera.lookAt(new THREE.Vector3().fromArray([0, 0, 0]));
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.enableZoom = true;
+controls.enablePan = true;
+controls.target.set(0, 0, 0);
+controls.update();
+
+const renderWidth = canvas.clientWidth;
+const renderHeight = canvas.clientHeight;
+const rootElement = document.createElement('div');
+rootElement.style.width = renderWidth + 'px';
+rootElement.style.height = renderHeight + 'px';
+document.body.appendChild(rootElement);
+const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    alpha: true,
+    premultipliedAlpha: false,
+    antialias: true,
+});
+rootElement.appendChild(renderer.domElement);
+
+const renderGS = initGaussian(renderer, camera, controls);
+const renderMesh = initMesh(renderer, camera, controls);
+
+/** @type {'gs' | 'mesh'} */
+let renderMode = 'gs';
+
+function render() {
+    if (renderMode === 'gs') {
+        renderGS();
     }
-
-    const renderer = new THREE.WebGLRenderer({
-        canvas,
-        alpha: true,
-        premultipliedAlpha: false,
-        antialias: true,
-    });
-
-    renderer.shadowMap.enabled = true; // 启用阴影
-
-    const camera = new THREE.PerspectiveCamera(65, canvas.clientWidth / canvas.clientHeight, 0.1, 500);
-    camera.up.set(0, -1, -0.6);
-    camera.lookAt(0, 0, 0);
-    camera.position.set(-1, -4, -6);
-
-    const controls = new OrbitControls(camera, canvas);
-    controls.enableDamping = false;
-    controls.dampingFactor = 0.1;
-    controls.enableZoom = true;
-    controls.enablePan = true;
-    controls.target.set(0, 0, 0);
-    controls.update();
-
-    const scene = new THREE.Scene();
-
-    class ColorGUIHelper {
-        constructor(object, prop) {
-            this.object = object;
-            this.prop = prop;
-        }
-
-        get value() {
-            return `#${this.object[this.prop].getHexString()}`;
-        }
-
-        set value(hexString) {
-            this.object[this.prop].set(hexString);
-        }
+    else if (renderMode === 'mesh') {
+        renderMesh();
     }
-
-    // Ambient Light
-    {
-        const color = 0xFFFFFF;
-        const intensity = 1;
-        const light = new THREE.AmbientLight(color, intensity);
-        scene.add(light);
-
-        const gui = new GUI();
-        gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-        gui.add(light, 'intensity', 0, 2, 0.01);
-    }
-
-    // Hemisphere Light
-    {
-        const skyColor = 0xB1E1FF; // light blue
-        const groundColor = 0xB97A20; // brownish orange
-        const intensity = 3;
-        const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
-        scene.add(light);
-    }
-
-    // Directional Light
-    {
-        const color = 0xFFFFFF;
-        const intensity = 3;
-        const light = new THREE.DirectionalLight(color, intensity);
-        light.position.set(0.8, 10, -7);
-        scene.add(light);
-        scene.add(light.target);
-
-        light.castShadow = true; // 允许光源投射阴影
-
-        light.shadow.mapSize.width = 2048; // 增加阴影的清晰度
-        light.shadow.mapSize.height = 2048;
-        light.shadow.camera.near = 1; // 调整阴影相机参数
-        light.shadow.camera.far = 50;
-        light.shadow.bias = -0.001; // 避免阴影的接缝
-    }
-
-    const mtlLoader = new MTLLoader();
-    mtlLoader.load('models/model-obj.mtl', (mtl) => {
-        mtl.preload();
-        const objLoader = new OBJLoader();
-
-        for (const material of Object.values(mtl.materials)) {
-            material.side = THREE.DoubleSide;
-        }
-
-        objLoader.setMaterials(mtl);
-
-        objLoader.load(
-            'models/model.obj',
-            (root) => {
-                scene.add(root);
-                requestRenderIfNotRequested(); // 在模型加载后触发渲染
-            }
-        );
-    });
-
-    function resizeRendererToDisplaySize(renderer) {
-        const canvas = renderer.domElement;
-        const width = canvas.clientWidth;
-        const height = canvas.clientHeight;
-        const needResize = canvas.width !== width || canvas.height !== height;
-        if (needResize) {
-            renderer.setSize(width, height, false);
-        }
-        return needResize;
-    }
-
-    let renderRequested = false;
-    function render() {
-        renderRequested = false;
-        if (resizeRendererToDisplaySize(renderer)) {
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
-        }
-        controls.update();
-        renderer.render(scene, camera);
-        //requestAnimationFrame(render);
-    }
-
-    function requestRenderIfNotRequested() {
-        if (!renderRequested) {
-            renderRequested = true;
-            console.log('render three');
-            requestAnimationFrame(render);
-        }
-    }
-
-    controls.addEventListener('change', requestRenderIfNotRequested);
-    window.addEventListener('resize', requestRenderIfNotRequested);
-
-
-
-    // 初始渲染
-    requestRenderIfNotRequested();
+    requestAnimationFrame(render);
 }
 
+requestAnimationFrame(render);
 
+window.addEventListener('keydown', (e) => {
+    if (e.key === '1') {
+        renderMode = 'gs';
+    } else if (e.key === '2') {
+        renderMode = 'mesh';
+    }
+});
 

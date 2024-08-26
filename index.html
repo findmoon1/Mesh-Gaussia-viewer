@@ -5,38 +5,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Model Switcher</title>
-	<style>
-		body {
-			margin: 0;
-			overflow: hidden;
-		}
-
-		canvas {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100vw;
-			height: 100vh;
-		}
-	</style>
 	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-
-
-
-	<canvas id="threeJSCanvas"></canvas>
-	<canvas id="gaussianCanvas"></canvas>
+	<canvas id='c'></canvas>
 	<script type="module" src="./main.js"></script>
-	<script type="module" src="./viewer.js"></script>
-	<script type="module" src="./switcher.js"></script>
-
-	<script type="module">
-		import { initSceneSwitcher } from './switcher.js';
-		initSceneSwitcher();
-	</script>
 </body>
 
 </html>

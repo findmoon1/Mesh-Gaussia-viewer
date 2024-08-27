@@ -68,28 +68,7 @@ export function initMesh(
         light.shadow.bias = -0.001; // 避免阴影的接缝
     }
 
-    // const mtlLoader = new MTLLoader();
-    // mtlLoader.load('models/model-obj.mtl', (mtl) => {
-    //     mtl.preload();
-    //     const objLoader = new OBJLoader();
 
-    //     for (const material of Object.values(mtl.materials)) {
-    //         material.side = THREE.DoubleSide;
-    //     }
-
-    //     objLoader.setMaterials(mtl);
-    // const objLoader = new OBJLoader();
-    // objLoader.load(
-    //     'models/model.obj',
-    //     (root) => {
-    //         console.log("Added model to scene");
-    //         scene.add(root);
-    //     },
-    //     (err) => {
-    //         console.error('Failed to load OBJ:', err);
-    //     }
-    // );
-    //});
 
     // 创建加载器
     const mtlLoader = new MTLLoader();

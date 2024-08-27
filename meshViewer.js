@@ -14,20 +14,6 @@ export function initMesh(
 ) {
     const scene = new THREE.Scene();
 
-    class ColorGUIHelper {
-        constructor(object, prop) {
-            this.object = object;
-            this.prop = prop;
-        }
-
-        get value() {
-            return `#${this.object[this.prop].getHexString()}`;
-        }
-
-        set value(hexString) {
-            this.object[this.prop].set(hexString);
-        }
-    }
 
     // Ambient Light
     {
@@ -36,9 +22,6 @@ export function initMesh(
         const light = new THREE.AmbientLight(color, intensity);
         scene.add(light);
 
-        const gui = new GUI();
-        gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-        gui.add(light, 'intensity', 0, 2, 0.01);
     }
 
     // Hemisphere Light
@@ -76,7 +59,7 @@ export function initMesh(
 
     // 加载 MTL 文件
     mtlLoader.load(
-        'models/model-obj.mtl',
+        'models/new-model-mesh/new-model.mtl',
         function (mtl) {
             // 预加载材质
             mtl.preload();
@@ -91,7 +74,7 @@ export function initMesh(
 
             // 加载 OBJ 文件
             objLoader.load(
-                'models/model.obj',
+                'models/new-model-mesh/new-model.obj',
                 function (obj) {
                     // 成功加载后的回调
                     console.log('Model loaded successfully');
@@ -118,22 +101,6 @@ export function initMesh(
     );
 
 
-    // const loader = new OBJLoader();
-
-    // loader.load(
-    //     "models/model.obj",
-    //     // onLoad callback
-    //     function (obj) {
-    //         // Add the loaded object to the scene
-    //         scene.add(obj);
-    //     },
-    //     function (xhr) {
-    //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    //     },
-    //     function (err) {
-    //         console.error('An error happened');
-    //     }
-    // );
 
     function resizeRendererToDisplaySize(renderer) {
         const canvas = renderer.domElement;

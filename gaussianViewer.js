@@ -44,7 +44,7 @@ export function initGaussian(
         viewer.render();
     }
 
-    viewer.addSplatScene('models/iteration_7000.splat', {
+    viewer.addSplatScene('models/new-model.ply', {
         'splatAlphaRemovalThreshold': 5,
         'showLoadingUI': true,
         'position': [0, 0, 0],

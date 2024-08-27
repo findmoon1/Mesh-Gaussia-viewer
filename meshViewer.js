@@ -78,34 +78,83 @@ export function initMesh(
     //     }
 
     //     objLoader.setMaterials(mtl);
-    //     objLoader.load(
-    //         'models/model.obj',
-    //         (root) => {
-    //             console.log("Added model to scene");
-    //             scene.add(root);
-    //         },
-    //         (err) => {
-    //             console.error('Failed to load OBJ:', err);
-    //         }
-    //     );
-    // });
+    // const objLoader = new OBJLoader();
+    // objLoader.load(
+    //     'models/model.obj',
+    //     (root) => {
+    //         console.log("Added model to scene");
+    //         scene.add(root);
+    //     },
+    //     (err) => {
+    //         console.error('Failed to load OBJ:', err);
+    //     }
+    // );
+    //});
 
-    const loader = new OBJLoader();
+    // 创建加载器
+    const mtlLoader = new MTLLoader();
+    const objLoader = new OBJLoader();
 
-    loader.load(
-        "models/model.obj",
-        // onLoad callback
-        function ( obj ) {
-            // Add the loaded object to the scene
-            scene.add( obj );
+    // 加载 MTL 文件
+    mtlLoader.load(
+        'models/model-obj.mtl',
+        function (mtl) {
+            // 预加载材质
+            mtl.preload();
+
+            // 设置材质的双面属性
+            for (const material of Object.values(mtl.materials)) {
+                material.side = THREE.DoubleSide;
+            }
+
+            // 设置 OBJLoader 使用这些材质
+            objLoader.setMaterials(mtl);
+
+            // 加载 OBJ 文件
+            objLoader.load(
+                'models/model.obj',
+                function (obj) {
+                    // 成功加载后的回调
+                    console.log('Model loaded successfully');
+                    scene.add(obj); // 将加载的对象添加到场景中
+                },
+                function (xhr) {
+                    // 显示加载进度
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+                function (err) {
+                    // 加载失败时的回调
+                    console.error('Failed to load OBJ file:', err);
+                }
+            );
         },
-        function ( xhr ) {
-            console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+        function (xhr) {
+            // 显示 MTL 文件加载进度
+            console.log((xhr.loaded / xhr.total * 100) + '% MTL loaded');
         },
-        function ( err ) {
-            console.error( 'An error happened' );
+        function (err) {
+            // MTL 文件加载失败时的回调
+            console.error('Failed to load MTL file:', err);
         }
     );
+
+
+    // const loader = new OBJLoader();
+
+    // loader.load(
+    //     "models/model.obj",
+    //     // onLoad callback
+    //     function (obj) {
+    //         // Add the loaded object to the scene
+    //         scene.add(obj);
+    //     },
+    //     function (xhr) {
+    //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    //     },
+    //     function (err) {
+    //         console.error('An error happened');
+    //     }
+    // );
 
     function resizeRendererToDisplaySize(renderer) {
         const canvas = renderer.domElement;
